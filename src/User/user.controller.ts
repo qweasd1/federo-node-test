@@ -1,7 +1,8 @@
-import {Controller, Get, Patch, Post, Param, Body,Delete} from '@nestjs/common';
+import {Controller, Get, Patch, Post, Param, Body, Delete, UseGuards} from '@nestjs/common';
 import { UserService} from './user.service';
 import { CreateUserDto} from './DTO/create-User.dto';
 import { ApiUseTags } from '@nestjs/swagger';
+import {AuthGuard} from '@nestjs/passport';
 
 @Controller('User')
 @ApiUseTags('HealthU')
@@ -29,6 +30,7 @@ export class UserController {
   }
 
   @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
   public async updateUser(@Param() params,@Body() newUser){
     const msg = await this.userService.updateUser(params.id,newUser);
     return msg;
@@ -52,9 +54,9 @@ export class UserController {
     return msg;
   }
 
-  @Post()
-  public async checkUserExisting(@Body() UserName){
-    const msg = await this.userService.checkUserExisting(UserName);
-    return msg;
+
+  @Post('/login')
+    public async checkLoginStatus(@Body() LogInfo) {
+      return await this.userService.checkLoginStatus(LogInfo);
   }
 }
